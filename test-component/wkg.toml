@@ -1,0 +1,2 @@
+[overrides]
+"example:bash" = { path = "../wit" }

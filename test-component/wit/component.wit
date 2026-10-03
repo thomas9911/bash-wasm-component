@@ -1,0 +1,10 @@
+package example:testing-bash;
+
+interface doit {
+    run: func() -> result<string, string>;
+}
+
+world component {
+    import example:bash/bash;
+    export doit;
+}

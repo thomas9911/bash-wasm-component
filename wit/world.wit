@@ -4,6 +4,10 @@ interface bash {
     resource bash-runner {
         constructor();
 
+        write-string: func(path: string, contents: string) -> result<_, string>;
+        read-string: func(path: string) -> result<string, string>;
+        list-files: func() -> result<list<string>, string>;
+
         execute: func(bash-script: string) -> result<string, string>;
     }
 
