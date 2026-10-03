@@ -1,0 +1,15 @@
+package example:bash;
+
+interface bash {
+    resource bash-runner {
+        constructor();
+
+        execute: func(bash-script: string) -> result<string, string>;
+    }
+
+    run-simple: func(bash-script: string) -> result<string, string>;
+}
+
+world main {
+    export bash;
+}
