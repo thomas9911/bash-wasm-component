@@ -7,7 +7,7 @@ use std::{
 
 use bashkit::{Bash, FileSystem, FileType};
 
-use crate::exports::example::bash::bash::{Guest, GuestBashRunner};
+use crate::exports::example::bash::bash::{Guest, GuestBashRunner, Response};
 use tokio::runtime::{Builder, Runtime};
 
 struct BashRunner {
@@ -88,6 +88,18 @@ impl GuestBashRunner for BashRunner {
             } else {
                 Err(res.stderr.to_string())
             }
+        })
+    }
+
+    fn execute_exit_response(&self, bash_script: String) -> Result<Response, String> {
+        let mut bash = self.bash.lock().unwrap();
+        self.runtime.block_on(async {
+            let res = bash.exec(&bash_script).await.map_err(|e| e.to_string())?;
+            Ok(Response {
+                exit_code: res.exit_code,
+                stdout: res.stdout.to_string(),
+                stderr: res.stderr.to_string(),
+            })
         })
     }
 }

@@ -1,12 +1,19 @@
 package example:bash;
 
 interface bash {
+  record response {
+    exit-code: s32,
+    stdout: string,
+    stderr: string,
+  }
+
   resource bash-runner {
     constructor();
     write-string: func(path: string, contents: string) -> result<_, string>;
     read-string: func(path: string) -> result<string, string>;
     list-files: func() -> result<list<string>, string>;
     execute: func(bash-script: string) -> result<string, string>;
+    execute-exit-response: func(bash-script: string) -> result<response, string>;
   }
 
   run-simple: func(bash-script: string) -> result<string, string>;

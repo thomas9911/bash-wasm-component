@@ -16,12 +16,16 @@ impl Guest for BashTester {
 
         dbg!(runner.execute("pwd && ls && cat hallo.txt")?);
         #[cfg(feature = "python")]
-        dbg!(runner.execute(r#"python3 -c "
+        dbg!(runner.execute(
+            r#"python3 -c "
 with open('/tmp/data.txt', 'w') as f:
     f.write('hello from python')
-""#)?);
+""#
+        )?);
         #[cfg(feature = "python")]
         dbg!(runner.execute("cat /tmp/data.txt | grep python")?);
+
+        dbg!(runner.execute_exit_response("echo hello && >&2 echo error && exit 24")?);
 
         Ok(String::new())
     }

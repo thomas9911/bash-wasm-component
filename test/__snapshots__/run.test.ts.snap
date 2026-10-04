@@ -26,6 +26,11 @@ with open('/tmp/data.txt', 'w') as f:
     f.write('hello from python')
 ""#)? = ""
 [src\\lib.rs:24:9] runner.execute("cat /tmp/data.txt | grep python")? = "hello from python\\n"
+[src\\lib.rs:26:9] runner.execute_exit_response("echo hello && >&2 echo error && exit 24")? = Response {
+    exit-code: 24,
+    stdout: "hello\\n",
+    stderr: "error\\n",
+}
 "
 ,
   "stdout": 
@@ -61,6 +66,11 @@ with open('/tmp/data.txt', 'w') as f:
     f.write('hello from python')
 ""#)? = ""
 [src\\lib.rs:24:9] runner.execute("cat /tmp/data.txt | grep python")? = "hello from python\\n"
+[src\\lib.rs:26:9] runner.execute_exit_response("echo hello && >&2 echo error && exit 24")? = Response {
+    exit-code: 24,
+    stdout: "hello\\n",
+    stderr: "error\\n",
+}
 "
 ,
   "stdout": 
