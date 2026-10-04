@@ -1,8 +1,11 @@
 wit_bindgen::generate!({ generate_all });
 
-use std::{path::{Path, PathBuf}, sync::{Arc, Mutex}};
+use std::{
+    path::{Path, PathBuf},
+    sync::{Arc, Mutex},
+};
 
-use bashkit::{Bash, BashBuilder, FileSystem, FileType};
+use bashkit::{Bash, FileSystem, FileType};
 
 use crate::exports::example::bash::bash::{Guest, GuestBashRunner};
 use tokio::runtime::{Builder, Runtime};
@@ -12,10 +15,23 @@ struct BashRunner {
     runtime: Runtime,
 }
 
+#[cfg(not(feature = "python"))]
+fn make_bash() -> Bash {
+    Bash::builder().build()
+}
+
+#[cfg(feature = "python")]
+fn make_bash() -> Bash {
+    Bash::builder()
+        .python()
+        .env("BASHKIT_ALLOW_INPROCESS_PYTHON", "1")
+        .build()
+}
+
 impl GuestBashRunner for BashRunner {
     fn new() -> Self {
         let runtime = Builder::new_current_thread().enable_time().build().unwrap();
-        let bash = Bash::builder().build();
+        let bash = make_bash();
         BashRunner {
             bash: Mutex::new(bash),
             runtime,
@@ -51,17 +67,17 @@ impl GuestBashRunner for BashRunner {
     fn list_files(&self) -> Result<Vec<String>, String> {
         let bash = self.bash.lock().unwrap();
         let fs = bash.fs();
-        let items = self
-            .runtime
-            .block_on(async {
-                let mut items = Vec::new();
-                inner_list_dir(fs, Path::new("/"), &mut items).await.map_err(|e| e.to_string())?;
-                Ok::<_, String>(items)
-            })?;
+        let items = self.runtime.block_on(async {
+            let mut items = Vec::new();
+            inner_list_dir(fs, Path::new("/"), &mut items)
+                .await
+                .map_err(|e| e.to_string())?;
+            items.sort_unstable();
+            Ok::<_, String>(items)
+        })?;
 
         Ok(items)
     }
-
 
     fn execute(&self, bash_script: String) -> Result<String, String> {
         let mut bash = self.bash.lock().unwrap();
@@ -76,7 +92,11 @@ impl GuestBashRunner for BashRunner {
     }
 }
 
-async fn inner_list_dir(fs: Arc<dyn FileSystem>, start: &Path, collected: &mut Vec<String>) -> Result<(), Box<dyn std::error::Error>> {
+async fn inner_list_dir(
+    fs: Arc<dyn FileSystem>,
+    start: &Path,
+    collected: &mut Vec<String>,
+) -> Result<(), Box<dyn std::error::Error>> {
     let items = fs.read_dir(start).await?;
     for item in items {
         let mut current = PathBuf::from(start);

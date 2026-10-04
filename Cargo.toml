@@ -7,6 +7,9 @@ edition = "2024"
 crate-type = ["cdylib"]
 
 [dependencies]
-bashkit = "0.18.2"
+bashkit = { version = "0.18.2", features = [] }
 tokio = "1.53.2"
 wit-bindgen = "0.62.0"
+
+[features]
+python = ["bashkit/python"]

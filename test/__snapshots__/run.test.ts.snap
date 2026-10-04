@@ -1,0 +1,71 @@
+// Bun Snapshot v1, https://bun.sh/docs/test/snapshots
+
+exports[`wac 1`] = `
+{
+  "stderr": 
+"cargo build -q --features python --release --target wasm32-wasip2
+cd test-component && wkg wit fetch && cargo build -q --features python --release --target wasm32-wasip2
+wac plug -o out.wasm --plug ./target/wasm32-wasip2/release/bash_wasm_component.wasm ./test-component/target/wasm32-wasip2/release/test_component.wasm
+wasmtime run --invoke 'run()' ./out.wasm
+[src\\lib.rs:11:9] runner.list_files()? = [
+    "/dev/null",
+    "/dev/random",
+    "/dev/urandom",
+]
+[src\\lib.rs:14:9] runner.read_string("./hallo.txt")? = "this is some text, nice"
+[src\\lib.rs:15:9] runner.list_files()? = [
+    "/dev/null",
+    "/dev/random",
+    "/dev/urandom",
+    "/hallo.txt",
+    "/home/user/hallo.txt",
+]
+[src\\lib.rs:17:9] runner.execute("pwd && ls && cat hallo.txt")? = "/home/user\\nhallo.txt\\nthis is some text in user folder"
+[src\\lib.rs:19:9] runner.execute(r#"python3 -c "
+with open('/tmp/data.txt', 'w') as f:
+    f.write('hello from python')
+""#)? = ""
+[src\\lib.rs:24:9] runner.execute("cat /tmp/data.txt | grep python")? = "hello from python\\n"
+"
+,
+  "stdout": 
+"ok("")
+"
+,
+}
+`;
+
+exports[`wac-no-python 1`] = `
+{
+  "stderr": 
+"cargo build -q --features python --release --target wasm32-wasip2
+cd test-component && wkg wit fetch && cargo build -q --features python --release --target wasm32-wasip2
+wac plug -o out.wasm --plug ./target/wasm32-wasip2/release/bash_wasm_component.wasm ./test-component/target/wasm32-wasip2/release/test_component.wasm
+wasmtime run --invoke 'run()' ./out.wasm
+[src\\lib.rs:11:9] runner.list_files()? = [
+    "/dev/null",
+    "/dev/random",
+    "/dev/urandom",
+]
+[src\\lib.rs:14:9] runner.read_string("./hallo.txt")? = "this is some text, nice"
+[src\\lib.rs:15:9] runner.list_files()? = [
+    "/dev/null",
+    "/dev/random",
+    "/dev/urandom",
+    "/hallo.txt",
+    "/home/user/hallo.txt",
+]
+[src\\lib.rs:17:9] runner.execute("pwd && ls && cat hallo.txt")? = "/home/user\\nhallo.txt\\nthis is some text in user folder"
+[src\\lib.rs:19:9] runner.execute(r#"python3 -c "
+with open('/tmp/data.txt', 'w') as f:
+    f.write('hello from python')
+""#)? = ""
+[src\\lib.rs:24:9] runner.execute("cat /tmp/data.txt | grep python")? = "hello from python\\n"
+"
+,
+  "stdout": 
+"ok("")
+"
+,
+}
+`;
